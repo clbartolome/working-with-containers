@@ -1,0 +1,28 @@
+FROM registry.access.redhat.com/ubi8/ubi:8.0
+
+MAINTAINER Carlos Lopez <calopezb@redhat.com>
+
+# DocumentRoot for Apache
+ENV DOCROOT=/var/www/html
+
+# Httpd installation
+RUN yum install --disableplugin=subscription-manager httpd -y
+RUN yum clean all --disableplugin=subscription-manager -y
+
+# Creating index page
+RUN echo "Hello from PARENT container!" > ${DOCROOT}/index.html
+
+# Allows child images to inject their own content into DocumentRoot
+ONBUILD COPY src/ ${DOCROOT}/
+
+# Httpd server port
+EXPOSE 80
+
+# This stuff is needed to ensure a clean start
+RUN rm -rf /run/httpd && mkdir /run/httpd
+
+# Run as the root user
+USER root
+
+# Launch httpd
+CMD /usr/sbin/httpd -DFOREGROUND
