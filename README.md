@@ -1,5 +1,6 @@
-# working-with-containers
-working-with-containers
+# Working with Containers
+
+Openshift workshop to review containers creation, deployment and security constraints.
 
 ## Parent Container
 
