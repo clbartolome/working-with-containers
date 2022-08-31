@@ -144,6 +144,49 @@ oc get route
 curl child-app-container-images.apps.XXXX
 ```
 
+## Deploy Applications
+
+Create namespace:
+
+```sh
+oc new-project deploy-apps
+```
+
+Use a pod file to run an image:
+
+```sh
+# Create pod
+oc apply -f hello.yaml
+
+# Delete pod
+oc delete pod hello
+```
+
+Create needed resources to deploy application:
+
+```sh
+# Create application
+oc new-app --name hello --docker-image openshift/hello-openshift --allow-missing-images
+
+# Review created resources
+oc get all
+
+# Expose application and test
+oc expose svc hello
+curl hello-deploy-apps.apps.XXXX
+
+# Clean up environment (show labels before)
+oc get deploy hello -o yaml
+oc get deploy --show-labels
+oc delete all -l app=hello
+oc get all
+```
+
+Deploy quarkus application (s2i)
+
+
+
+
 
 
 
