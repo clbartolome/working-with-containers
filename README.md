@@ -184,6 +184,8 @@ oc get all
 
 Deploy quarkus application (s2i)
 
+```
+
 
 
 
