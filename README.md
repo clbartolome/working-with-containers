@@ -16,7 +16,7 @@ podman inspect parent
 podman image inspect parent --format "{{len .RootFS.Layers}}"
 
 # Run parent container
-podman run --name parent -d -p 80:80 parent
+podman run --name parent -d -p 81:80 parent
 ```
 
 Update parent container to reduce number of layers and size:
@@ -156,7 +156,7 @@ Use a pod file to run an image:
 
 ```sh
 # Create pod
-oc apply -f hello.yaml
+oc apply -f hello-openshift/pod.yaml
 
 # Delete pod
 oc delete pod hello
@@ -182,7 +182,7 @@ oc delete all -l app=hello
 oc get all
 ```
 
-Deploy quarkus application (s2i)
+## Deploy quarkus application (s2i)
 
 ```sh
 # Deploy application
@@ -212,43 +212,36 @@ curl greet-deploy-apps.apps.cluster-6rfq7.6rfq7.sandbox1585.opentlc.com/hello
 oc delete all -l app=greet
 ```
 
-Deploy with jkube
+## Deploy with jkube
+
+Review jkube-java project. Generate application resources:
 
 ```sh
-# Deploy application
-oc new-app --name=greet openshift/ubi8-openjdk-11:1.3~https://github.com/clbartolome/working-with-containers --context-dir quarkus-greet
-
-# Follow build logs
-oc logs -f bc/greet
-
-# Expose and test
-oc expose svc greet
-oc get route greet
-curl greet-deploy-apps.apps.XXXX/hello
-
-# Create and apply configuration map
-oc create cm greet-config --from-literal APP_GREET="Hola desde el configmap"
-oc set env deploy/greet --from cm/greet-config 
-oc get cm greet-config -o yaml
-
-# Review environment variable
-oc get pods
-oc rsh greet-xxxx # (echo $APP_GREET)
-
-# Test application
-curl greet-deploy-apps.apps.cluster-6rfq7.6rfq7.sandbox1585.opentlc.com/hello
-
-# Clean up
-oc delete all -l app=greet
+mvn oc:resource
 ```
 
+Application resources are in `jkube-java/target/classes/META-INF/jkube/openshift/`
 
+Include the following deployment in `jkube-java/src/main/jkube/deployment.yaml` to modify replicas:
 
+```yaml
+spec:
+  replicas: 5
+```
 
+Create also a configmap in `jkube-java/src/main/jkube/cm.yaml` to create a configuration map:
 
+```yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: configmap-hello
+data:
+  MESSAGE: hola!
+```
 
+Review the new resources:
 
-
-
-
-
+```sh
+mvn oc:resource
+```
